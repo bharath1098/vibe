@@ -63,41 +63,126 @@ const ContactUs = () => {
 
     try {
       // Google Sheets integration via Apps Script Web App
-      // Replace with your Google Apps Script URL
-      const scriptURL = 'YOUR_GOOGLE_APPS_SCRIPT_URL'
+      // Set VITE_GOOGLE_SHEETS_URL in your .env file or use the default
+      const scriptURL = import.meta.env.VITE_GOOGLE_SHEETS_URL || 'https://script.google.com/macros/s/AKfycbxAeqtd6po7ou_e7tQP47Uv9yZ-uEFigKjnIaN1QxgoNkS-rjsNU7YERW4SDjMBUlmI/exec'
       
-      const response = await fetch(scriptURL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          timestamp: new Date().toISOString(),
-          ...formData,
-        }),
-      })
+      console.log('Submitting form to:', scriptURL)
+      console.log('Form data:', formData)
+      
+      // Prepare form data
+      const formFields = {
+        timestamp: new Date().toISOString(),
+        name: formData.name || '',
+        email: formData.email || '',
+        phone: formData.phone || '',
+        company: formData.company || '',
+        message: formData.message || '',
+        investing: formData.investing ? 'true' : 'false',
+        partnership: formData.partnership ? 'true' : 'false',
+      }
 
-      // Since we're using no-cors, we can't check the response
-      // Assume success after a delay
-      setTimeout(() => {
-        setIsSubmitting(false)
-        setSubmitStatus('success')
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          company: '',
-          message: '',
-          investing: false,
-          partnership: false,
-        })
+      // Build URL-encoded string for POST
+      const formBody = Object.entries(formFields)
+        .map(([key, value]) => encodeURIComponent(key) + '=' + encodeURIComponent(String(value)))
+        .join('&')
+
+      console.log('Form body:', formBody)
+
+      // Try POST first, then fallback to GET if needed
+      try {
+        const xhr = new XMLHttpRequest()
+        xhr.open('POST', scriptURL, true)
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
         
-        // Reset success message after 5 seconds
+        await new Promise((resolve) => {
+          xhr.onload = function() {
+            console.log('POST Response:', xhr.status, xhr.responseText)
+            resolve(xhr.responseText)
+          }
+          
+          xhr.onerror = function() {
+            console.log('POST failed, trying GET fallback...')
+            // Fallback to GET method
+            const queryString = Object.entries(formFields)
+              .map(([key, value]) => encodeURIComponent(key) + '=' + encodeURIComponent(String(value)))
+              .join('&')
+            
+            // Use hidden iframe for GET request
+            const iframe = document.createElement('iframe')
+            iframe.style.display = 'none'
+            iframe.src = scriptURL + '?' + queryString
+            document.body.appendChild(iframe)
+            
+            setTimeout(() => {
+              if (iframe.parentNode) {
+                document.body.removeChild(iframe)
+              }
+            }, 3000)
+            
+            resolve('')
+          }
+          
+          xhr.send(formBody)
+          
+          // Timeout after 5 seconds
+          setTimeout(() => {
+            if (xhr.readyState !== 4) {
+              console.log('POST timeout, trying GET fallback...')
+              const queryString = Object.entries(formFields)
+                .map(([key, value]) => encodeURIComponent(key) + '=' + encodeURIComponent(String(value)))
+                .join('&')
+              
+              const iframe = document.createElement('iframe')
+              iframe.style.display = 'none'
+              iframe.src = scriptURL + '?' + queryString
+              document.body.appendChild(iframe)
+              
+              setTimeout(() => {
+                if (iframe.parentNode) {
+                  document.body.removeChild(iframe)
+                }
+              }, 3000)
+            }
+          }, 5000)
+        })
+      } catch (error) {
+        console.log('Error submitting form:', error)
+        // Fallback to GET
+        const queryString = Object.entries(formFields)
+          .map(([key, value]) => encodeURIComponent(key) + '=' + encodeURIComponent(String(value)))
+          .join('&')
+        
+        const iframe = document.createElement('iframe')
+        iframe.style.display = 'none'
+        iframe.src = scriptURL + '?' + queryString
+        document.body.appendChild(iframe)
+        
         setTimeout(() => {
-          setSubmitStatus('idle')
-        }, 5000)
-      }, 1000)
+          if (iframe.parentNode) {
+            document.body.removeChild(iframe)
+          }
+        }, 3000)
+      }
+
+      // Wait a moment for the submission to complete
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      
+      setIsSubmitting(false)
+      setSubmitStatus('success')
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        company: '',
+        message: '',
+        investing: false,
+        partnership: false,
+      })
+      
+      // Reset success message after 5 seconds
+      setTimeout(() => {
+        setSubmitStatus('idle')
+      }, 5000)
     } catch (error) {
       setIsSubmitting(false)
       setSubmitStatus('error')

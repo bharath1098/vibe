@@ -18,7 +18,6 @@ import {
   Palette,
   Rocket,
   Cloud,
-  Lock,
   Smartphone,
 } from 'lucide-react'
 import { useState } from 'react'
