@@ -23,7 +23,7 @@ import {
 import { useState } from 'react'
 
 const ProjectOverview = () => {
-  const [activeTab, setActiveTab] = useState<'architecture' | 'subscription' | 'features'>('architecture')
+  const [activeTab, setActiveTab] = useState<'architecture' | 'subscription' | 'features'>('subscription')
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -66,8 +66,8 @@ const ProjectOverview = () => {
         {/* Tabs */}
         <div className="flex flex-wrap justify-center gap-2 mb-12">
           {[
-            { id: 'architecture', label: 'Architecture', icon: Layers },
             { id: 'subscription', label: 'Subscription Model', icon: CreditCard },
+            { id: 'architecture', label: 'Architecture', icon: Layers },
             { id: 'features', label: 'Features', icon: Sparkles },
           ].map((tab) => {
             const Icon = tab.icon
@@ -89,6 +89,146 @@ const ProjectOverview = () => {
             )
           })}
         </div>
+
+        {/* Subscription Model Tab */}
+        {activeTab === 'subscription' && (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="space-y-8"
+          >
+            <motion.div variants={itemVariants} className="text-center mb-8">
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">Subscription Plans for Agents</h3>
+              <p className="text-lg text-gray-600">Choose the perfect plan for your travel agency</p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                {
+                  name: 'Starter',
+                  price: '$99',
+                  period: '/month',
+                  description: 'Perfect for small agencies',
+                  features: [
+                    'White-label portal',
+                    'Up to 100 bookings/month',
+                    'Basic branding customization',
+                    'Flight booking only',
+                    'Email support',
+                    'Standard API access',
+                  ],
+                  color: 'from-blue-500 to-blue-600',
+                  popular: false,
+                },
+                {
+                  name: 'Professional',
+                  price: '$299',
+                  period: '/month',
+                  description: 'For growing travel businesses',
+                  features: [
+                    'Full white-label solution',
+                    'Unlimited bookings',
+                    'Advanced branding & customization',
+                    'Flights + Hotels + Cars',
+                    'Priority support',
+                    'Advanced API access',
+                    'Analytics dashboard',
+                    'Multi-currency support',
+                  ],
+                  color: 'from-primary to-blue-700',
+                  popular: true,
+                },
+                {
+                  name: 'Enterprise',
+                  price: 'Custom',
+                  period: '',
+                  description: 'For large agencies & corporations',
+                  features: [
+                    'Everything in Professional',
+                    'Dedicated account manager',
+                    'Custom integrations',
+                    'SLA guarantee',
+                    '24/7 phone support',
+                    'Custom domain support',
+                    'Advanced security features',
+                    'Volume discounts',
+                  ],
+                  color: 'from-purple-500 to-purple-600',
+                  popular: false,
+                },
+              ].map((plan, index) => (
+                <motion.div
+                  key={index}
+                  variants={itemVariants}
+                  whileHover={{ y: -8, scale: 1.02 }}
+                  className={`relative bg-white rounded-3xl shadow-xl p-8 border-2 flex flex-col ${
+                    plan.popular ? 'border-primary' : 'border-gray-200'
+                  }`}
+                >
+                  {plan.popular && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                      <span className="bg-primary text-white px-4 py-1 rounded-full text-sm font-semibold">
+                        Most Popular
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div className="text-center mb-6">
+                    <h4 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h4>
+                    <p className="text-gray-600 mb-4">{plan.description}</p>
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
+                      <span className="text-gray-600">{plan.period}</span>
+                    </div>
+                  </div>
+
+                  <ul className="space-y-3 mb-6 flex-1">
+                    {plan.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-gray-700">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r ${plan.color} shadow-lg hover:shadow-xl transition-all mt-auto`}
+                  >
+                    Get Started
+                  </motion.button>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Additional Info */}
+            <motion.div
+              variants={itemVariants}
+              className="bg-gradient-to-r from-accent/10 to-primary/10 rounded-2xl p-6 border border-accent/20"
+            >
+              <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-primary" />
+                Revenue Model
+              </h4>
+              <div className="grid md:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <p className="font-semibold text-gray-900 mb-1">Subscription Fees</p>
+                  <p className="text-gray-600">Monthly/annual subscription based on plan tier</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900 mb-1">Transaction Fees</p>
+                  <p className="text-gray-600">Small commission per booking (2-5%)</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900 mb-1">Add-on Services</p>
+                  <p className="text-gray-600">Premium features, custom integrations, training</p>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
 
         {/* Architecture Tab */}
         {activeTab === 'architecture' && (
@@ -221,146 +361,6 @@ const ProjectOverview = () => {
                       <p className="text-gray-700">Backend filters all data by tenant_id ensuring complete isolation</p>
                     </div>
                   </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-
-        {/* Subscription Model Tab */}
-        {activeTab === 'subscription' && (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="space-y-8"
-          >
-            <motion.div variants={itemVariants} className="text-center mb-8">
-              <h3 className="text-3xl font-bold text-gray-900 mb-4">Subscription Plans for Agents</h3>
-              <p className="text-lg text-gray-600">Choose the perfect plan for your travel agency</p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              {[
-                {
-                  name: 'Starter',
-                  price: '$99',
-                  period: '/month',
-                  description: 'Perfect for small agencies',
-                  features: [
-                    'White-label portal',
-                    'Up to 100 bookings/month',
-                    'Basic branding customization',
-                    'Flight booking only',
-                    'Email support',
-                    'Standard API access',
-                  ],
-                  color: 'from-blue-500 to-blue-600',
-                  popular: false,
-                },
-                {
-                  name: 'Professional',
-                  price: '$299',
-                  period: '/month',
-                  description: 'For growing travel businesses',
-                  features: [
-                    'Full white-label solution',
-                    'Unlimited bookings',
-                    'Advanced branding & customization',
-                    'Flights + Hotels + Cars',
-                    'Priority support',
-                    'Advanced API access',
-                    'Analytics dashboard',
-                    'Multi-currency support',
-                  ],
-                  color: 'from-primary to-blue-700',
-                  popular: true,
-                },
-                {
-                  name: 'Enterprise',
-                  price: 'Custom',
-                  period: '',
-                  description: 'For large agencies & corporations',
-                  features: [
-                    'Everything in Professional',
-                    'Dedicated account manager',
-                    'Custom integrations',
-                    'SLA guarantee',
-                    '24/7 phone support',
-                    'Custom domain support',
-                    'Advanced security features',
-                    'Volume discounts',
-                  ],
-                  color: 'from-purple-500 to-purple-600',
-                  popular: false,
-                },
-              ].map((plan, index) => (
-                <motion.div
-                  key={index}
-                  variants={itemVariants}
-                  whileHover={{ y: -8, scale: 1.02 }}
-                  className={`relative bg-white rounded-3xl shadow-xl p-8 border-2 ${
-                    plan.popular ? 'border-primary' : 'border-gray-200'
-                  }`}
-                >
-                  {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <span className="bg-primary text-white px-4 py-1 rounded-full text-sm font-semibold">
-                        Most Popular
-                      </span>
-                    </div>
-                  )}
-                  
-                  <div className="text-center mb-6">
-                    <h4 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h4>
-                    <p className="text-gray-600 mb-4">{plan.description}</p>
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
-                      <span className="text-gray-600">{plan.period}</span>
-                    </div>
-                  </div>
-
-                  <ul className="space-y-3 mb-6">
-                    {plan.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm text-gray-700">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r ${plan.color} shadow-lg hover:shadow-xl transition-all`}
-                  >
-                    Get Started
-                  </motion.button>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Additional Info */}
-            <motion.div
-              variants={itemVariants}
-              className="bg-gradient-to-r from-accent/10 to-primary/10 rounded-2xl p-6 border border-accent/20"
-            >
-              <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-primary" />
-                Revenue Model
-              </h4>
-              <div className="grid md:grid-cols-3 gap-4 text-sm">
-                <div>
-                  <p className="font-semibold text-gray-900 mb-1">Subscription Fees</p>
-                  <p className="text-gray-600">Monthly/annual subscription based on plan tier</p>
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-900 mb-1">Transaction Fees</p>
-                  <p className="text-gray-600">Small commission per booking (2-5%)</p>
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-900 mb-1">Add-on Services</p>
-                  <p className="text-gray-600">Premium features, custom integrations, training</p>
                 </div>
               </div>
             </motion.div>
